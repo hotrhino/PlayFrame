@@ -15,7 +15,6 @@
 #include "heap_timer.h"
 #include "server_frame.h"
 #include "msg_module_base.h"
-#include "lua_config.h"
 #include "lua_engine.h"
 #include "mysql_mgr.h"
 

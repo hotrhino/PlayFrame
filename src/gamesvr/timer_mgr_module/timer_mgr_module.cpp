@@ -22,7 +22,7 @@ void TimerMgrModule::ModuleInit()
     ConfigModule* conf_module = FindModule<ConfigModule>(app_);
 
     // timer_heap 初始化
-    heap_timer_ = new HeapTimer(conf_module->GetTimerInitSize());
+    heap_timer_ = new HeapTimer(conf_module->config().timer_init_size());
 
     CHECK(heap_timer_ != NULL)
         << "timer heap init error!";

@@ -19,8 +19,8 @@ ConnMgrModule::~ConnMgrModule()
 void ConnMgrModule::ModuleInit()
 {
     ConfigModule* conf_module = FindModule<ConfigModule>(app_);
-    int32_t conn_pool_shm_key = conf_module->conn_pool_shm_key();
-    int32_t conn_pool_size = conf_module->conn_pool_size();
+    int32_t conn_pool_shm_key = conf_module->config().conn_pool_shm_key();
+    int32_t conn_pool_size = conf_module->config().conn_pool_size();
 
     char cmd[512] = {0};
     snprintf(cmd, 512, "ipcrm -M 0x%08x", conn_pool_shm_key);

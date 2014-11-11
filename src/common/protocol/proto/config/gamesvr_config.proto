@@ -1,0 +1,12 @@
+package Config;
+
+message GameSvr {
+    optional int32 timer_init_size = 1 [default = 0];
+    optional int32 player_pool_shm_key = 2 [default = 0];
+    optional int32 player_pool_size = 3 [default = 100];
+    optional int32 city_pool_shm_key = 4 [default = 0];
+    optional int32 city_pool_size = 5 [default = 100];
+    optional string connsvr_zmq_addr = 6;
+    optional string datasvr_zmq_addr = 7;
+}
+

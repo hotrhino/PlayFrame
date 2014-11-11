@@ -1,0 +1,10 @@
+package Config;
+
+message DataSvr {
+    optional string mysql_host = 1 [default = "localhost"];
+    optional string mysql_user = 2 [default = "root"];
+    optional string mysql_password = 3 [default = ""];
+    optional string mysql_dbname = 4 [default = ""];
+    optional string gamesvr_zmq_addr = 5;
+}
+

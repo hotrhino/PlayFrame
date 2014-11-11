@@ -32,13 +32,13 @@ void MsgModule::ModuleInit()
     connsvr_zmq_sock_ = zmq_socket(zmq_ctx_, ZMQ_PAIR);
     PCHECK(connsvr_zmq_sock_ != NULL)
         << "zmq_socket error!";
-    PCHECK(zmq_bind(connsvr_zmq_sock_, conf_module->GetConnsvrZmqAddr()) == 0)
+    PCHECK(zmq_bind(connsvr_zmq_sock_, conf_module->config().connsvr_zmq_addr().c_str()) == 0)
         << "zmq_bind error!";
 
     datasvr_zmq_sock_ = zmq_socket(zmq_ctx_, ZMQ_PAIR);
     PCHECK(datasvr_zmq_sock_ != NULL)
         << "zmq_socket error!";
-    PCHECK(zmq_connect(datasvr_zmq_sock_, conf_module->GetDatasvrZmqAddr()) == 0)
+    PCHECK(zmq_connect(datasvr_zmq_sock_, conf_module->config().datasvr_zmq_addr().c_str()) == 0)
         << "zmq_connect error!";
 
     // 注册消息处理函数

@@ -9,11 +9,12 @@
 #define _CONFIG_MODULE_H_
 
 #include "app_def.h"
+#include "gamesvr_config.pb.h"
 
 class ConfigModule : public AppModuleBase
 {
 public:
-	ConfigModule(App* app, const char* lua_conf_file);
+	ConfigModule(App* app, const char* conf_file);
 	virtual ~ConfigModule();
 
 	virtual void            ModuleInit();
@@ -23,54 +24,15 @@ public:
 	static AppModuleBase*   CreateModule(App* app, const char* conf_file);
 
 public:
-    inline int32_t GetTimerInitSize() const 
+    inline const Config::GameSvr& config() const
     {
-        return timer_init_size_;
+        return config_; 
     }
 
-    inline const char* GetConnsvrZmqAddr() const 
-    {
-        return connsvr_zmq_addr_.c_str();
-    }
-
-    inline const char* GetDatasvrZmqAddr() const 
-    {
-        return datasvr_zmq_addr_.c_str();
-    }
-
-	inline int32_t GetPlayerPoolShmKey() const 
-    {
-		return player_pool_shm_key_;
-	}
-
-	inline int32_t GetPlayerPoolSize() const 
-    {
-		return player_pool_size_;
-	}
-    
-	inline int32_t GetCityPoolShmKey() const 
-    {
-		return city_pool_shm_key_;
-	}
-
-	inline int32_t GetCityPoolSize() const 
-    {
-		return city_pool_size_;
-	}
-    
 private:
+    Config::GameSvr config_;
     std::string     conf_file_;
-    LuaConfig       config_;
-
-private:
-    int32_t         timer_init_size_;
-    std::string     connsvr_zmq_addr_;
-    std::string     datasvr_zmq_addr_;
-    int32_t         player_pool_shm_key_;
-    int32_t         player_pool_size_;
-    int32_t         city_pool_shm_key_;
-    int32_t         city_pool_size_;
 };
 
-#endif // _CONFIG_MODULE_H_
+#endif
 

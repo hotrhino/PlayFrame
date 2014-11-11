@@ -13,7 +13,6 @@
 #include "time_value.h"
 #include "server_frame.h"
 #include "msg_module_base.h"
-#include "lua_config.h"
 #include "mysql_mgr.h"
 
 // protocol

@@ -8,27 +8,29 @@
 #include "config_module.h"
 #include "app.h"
 
-ConfigModule::ConfigModule(App* app, const char* lua_conf_file)
+ConfigModule::ConfigModule(App* app, const char* conf_file)
 	: AppModuleBase(app),
-      conf_file_(lua_conf_file)
-{}
+      conf_file_(conf_file)
+{
+    app_ = app;
+}
 
 ConfigModule::~ConfigModule()
 {}
 
 void ConfigModule::ModuleInit()
 {
-    config_.Init(conf_file_.c_str());
+    int conf_fd = open(conf_file_.c_str(), O_RDONLY);
+    PCHECK(conf_fd > 0)
+        << "open config file failed!";
 
-    // 获取各配置项
-    timer_init_size_ = config_.Get<int>("timer_init_size");
-    connsvr_zmq_addr_ = config_.Get<const char*>("connsvr_zmq_addr");
-    datasvr_zmq_addr_ = config_.Get<const char*>("datasvr_zmq_addr");
-	player_pool_shm_key_ = config_.Get<int>("player_pool_shm_key");
-	player_pool_size_ = config_.Get<int>("player_pool_size");
-	city_pool_shm_key_ = config_.Get<int>("city_pool_shm_key");
-	city_pool_size_ = config_.Get<int>("city_pool_size");
+    google::protobuf::io::FileInputStream file_input(conf_fd);
+    file_input.SetCloseOnDelete(true);
+    bool is_parse_succ = google::protobuf::TextFormat::Parse(&file_input, &config_);
+    PCHECK(is_parse_succ == true)
+        << "config: protobuf textformat parse failed!";
 
+    LOG(INFO) << config_.Utf8DebugString();
 	LOG(INFO) << ModuleName() << " init ok!";
 }
 
@@ -39,8 +41,8 @@ void ConfigModule::ModuleFini()
 
 const char* ConfigModule::ModuleName() const
 {
-	static const std::string module_name = "ConfigModule";
-	return module_name.c_str();
+	static const std::string ModuleName = "ConfigModule";
+	return ModuleName.c_str();
 }
 
 int32_t ConfigModule::ModuleId()
@@ -50,11 +52,11 @@ int32_t ConfigModule::ModuleId()
 
 AppModuleBase* ConfigModule::CreateModule(App* app, const char* conf_file)
 {
-	ConfigModule* conf_module = new ConfigModule(app, conf_file);
-	if (conf_module != NULL) {
-        conf_module->ModuleInit();
+	ConfigModule* module = new ConfigModule(app, conf_file);
+	if (module != NULL) {
+        module->ModuleInit();
 	}
 
-	return static_cast<AppModuleBase*>(conf_module);
+	return static_cast<AppModuleBase*>(module);
 }
 

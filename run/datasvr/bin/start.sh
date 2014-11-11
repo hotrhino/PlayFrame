@@ -11,7 +11,7 @@
 cd `dirname $0`
 process_name="datasvr"
 
-./$process_name --conf-file=../conf/config.lua --log-path=../log --log-level=info -D start 
+./$process_name --conf-file=../cfg/config.cfg --log-path=../log --log-level=info -D start 
 echo "$process_name start..."
 
 while true

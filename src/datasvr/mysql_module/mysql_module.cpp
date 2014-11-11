@@ -20,10 +20,10 @@ void MysqlModule::ModuleInit()
 {
     ConfigModule* conf_module = FindModule<ConfigModule>(app_);
     Init(E_MAX_MYSQL_CLIENT_COUNT,
-        conf_module->mysql_host(),
-        conf_module->mysql_user(),
-        conf_module->mysql_password(),
-        conf_module->mysql_dbname());
+        conf_module->config().mysql_host(),
+        conf_module->config().mysql_user(),
+        conf_module->config().mysql_password(),
+        conf_module->config().mysql_dbname());
 
 	LOG(INFO) << ModuleName() << " init ok!";
 }

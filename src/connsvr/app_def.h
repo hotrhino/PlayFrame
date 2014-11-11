@@ -13,7 +13,6 @@
 #include "time_value.h"
 #include "app_base.h"
 #include "server_frame.h"
-#include "lua_config.h"
 #include "epoller.h"
 #include "utils.h"
 

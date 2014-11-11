@@ -19,14 +19,14 @@ ObjMgrModule::~ObjMgrModule()
 void ObjMgrModule::ModuleInit()
 {
     ConfigModule* conf_module = FindModule<ConfigModule>(app_);
-    int32_t player_pool_shm_key = conf_module->GetPlayerPoolShmKey();
-    int32_t player_pool_size = conf_module->GetPlayerPoolSize();
+    int32_t player_pool_shm_key = conf_module->config().player_pool_shm_key();
+    int32_t player_pool_size = conf_module->config().player_pool_size();
 
     CHECK(m_player_pool.Init(player_pool_size, player_pool_shm_key) == 0)
         << "player_pool init error!";
 
-    int32_t city_pool_shm_key = conf_module->GetCityPoolShmKey();
-    int32_t city_pool_size = conf_module->GetCityPoolSize();
+    int32_t city_pool_shm_key = conf_module->config().city_pool_shm_key();
+    int32_t city_pool_size = conf_module->config().city_pool_size();
 
     CHECK(m_city_pool.Init(city_pool_size, city_pool_shm_key) == 0)
         << "city_pool init error!";

@@ -1,0 +1,9 @@
+package Config;
+
+message ConnSvr {
+    optional int32 listen_port = 1 [default = 0];
+    optional int32 conn_pool_shm_key = 2 [default = 0];
+    optional int32 conn_pool_size = 3 [default = 100];
+    optional string gamesvr_zmq_addr = 4;
+}
+

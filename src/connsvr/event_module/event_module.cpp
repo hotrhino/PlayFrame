@@ -32,7 +32,7 @@ void EventModule::ModuleInit()
     Epoller::SetSocketOpt(listen_fd_);
 
     ConfigModule* conf_module = FindModule<ConfigModule>(app_);
-    int32_t listen_port = conf_module->listen_port();
+    int32_t listen_port = conf_module->config().listen_port();
 
     struct sockaddr_in sin;
     sin.sin_family = AF_INET;
@@ -52,11 +52,11 @@ void EventModule::ModuleInit()
     zmq_sock_ = zmq_socket(zmq_ctx_, ZMQ_PAIR);
     PCHECK(zmq_sock_ != NULL)
         << "zmq_socket error!";
-    PCHECK(zmq_connect(zmq_sock_, conf_module->gamesvr_zmq_addr()) == 0)
+    PCHECK(zmq_connect(zmq_sock_, conf_module->config().gamesvr_zmq_addr().c_str()) == 0)
         << "zmq_connect error!";
 
     // 初始化 Epoller
-    int32_t conn_pool_size = conf_module->conn_pool_size();
+    int32_t conn_pool_size = conf_module->config().conn_pool_size();
     epoller_ = new Epoller();
     epoller_->Init(conn_pool_size);
     
@@ -119,7 +119,7 @@ void EventModule::DoTcpAccept(int listen_fd, void* arg)
     socklen_t len = sizeof(sin);
 
     ConfigModule* conf_module = FindModule<ConfigModule>(App::GetInstance());
-    int32_t max_connection = conf_module->conn_pool_size();
+    int32_t max_connection = conf_module->config().conn_pool_size();
 
     ConnMgrModule* conn_mgr_module = FindModule<ConnMgrModule>(App::GetInstance());
     int32_t cur_conn_map_size = conn_mgr_module->GetCurConnMapSize();

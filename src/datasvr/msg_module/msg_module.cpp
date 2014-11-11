@@ -28,7 +28,7 @@ void MsgModule::ModuleInit()
     gamesvr_zmq_sock_ = zmq_socket(zmq_ctx_, ZMQ_PAIR);
     PCHECK(gamesvr_zmq_sock_ != NULL)
         << "zmq_socket error!";
-    PCHECK(zmq_bind(gamesvr_zmq_sock_, conf_module->gamesvr_zmq_addr()) == 0)
+    PCHECK(zmq_bind(gamesvr_zmq_sock_, conf_module->config().gamesvr_zmq_addr().c_str()) == 0)
         << "zmq_bind error!";
 
     // 注册消息处理函数

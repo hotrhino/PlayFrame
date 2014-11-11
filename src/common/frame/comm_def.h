@@ -52,6 +52,9 @@ extern "C"
 	#include "lualib.h"
 	#include "lauxlib.h"
 };
+#include "text_format.h"
+#include "io/zero_copy_stream_impl.h"
+
 
 // ConnData
 enum ConnCmd {

@@ -21,3 +21,11 @@ EXECUTE_PROCESS(COMMAND ${PROTOC} -I=${PROTOCOL_DIR}/proto/ss_proto
 EXECUTE_PROCESS(COMMAND ${PROTOC} -I=${PROTOCOL_DIR}/proto/ss_proto 
     --cpp_out=${PROTOCOL_DIR}/cpp ${PROTOCOL_DIR}/proto/ss_proto/ss_data.proto)
 
+#CONFIG
+EXECUTE_PROCESS(COMMAND ${PROTOC} -I=${PROTOCOL_DIR}/proto/config
+    --cpp_out=${PROTOCOL_DIR}/cpp ${PROTOCOL_DIR}/proto/config/connsvr_config.proto)
+EXECUTE_PROCESS(COMMAND ${PROTOC} -I=${PROTOCOL_DIR}/proto/config
+    --cpp_out=${PROTOCOL_DIR}/cpp ${PROTOCOL_DIR}/proto/config/gamesvr_config.proto)
+EXECUTE_PROCESS(COMMAND ${PROTOC} -I=${PROTOCOL_DIR}/proto/config
+    --cpp_out=${PROTOCOL_DIR}/cpp ${PROTOCOL_DIR}/proto/config/datasvr_config.proto)
+
