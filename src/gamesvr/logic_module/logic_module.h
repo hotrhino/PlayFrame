@@ -32,28 +32,9 @@ class LogicModule : public AppModuleBase,
             (void)data;
             LOG(INFO) << "OnTimer: logic_id[" << logic_id << "] TIMEOUT!!!!";
 
-            DeleteLogic(logic_id);
+            DeleteLogicData(logic_id);
 
             return -1;
-        }
-
-        int64_t CreateLogic(int32_t logic_type, time_t task_delay_secs);
-        void Proc(int64_t logic_id, void* msg, void* args);
-
-        void DeleteLogic(int64_t logic_id)
-        {
-            LogicDataMap::iterator it = logic_data_map_.find(logic_id);
-            if (it != logic_data_map_.end()) {
-                LogicDataHead* head = (LogicDataHead*)(it->second);
-                LOG(INFO)
-                    << "delete logic_id[" << head->logic_id
-                    << "] logic_type[" << head->logic_type
-                    << "] step[" << head->step
-                    << "]";
-                free(it->second);
-                it->second = NULL;
-                logic_data_map_.erase(it);
-            }
         }
 
         void Update()
@@ -62,23 +43,21 @@ class LogicModule : public AppModuleBase,
             heap_timer_->TimerPoll(now);
         }
 
-
-        void* GetLogicData(int64_t logic_id)
-        {
-            LogicDataMap::iterator it = logic_data_map_.find(logic_id);
-            if (it != logic_data_map_.end())
-                return it->second;
-
-            return NULL;
-        }
+        int64_t CreateLogic(int32_t logic_type, time_t task_delay_secs);
+        void Proc(int64_t logic_id, void* msg, void* args);
+        void DeleteLogicData(int64_t logic_id);
+        void* GetLogicData(int64_t logic_id);
+        const char* GetLogicName(int32_t logic_type);
 
 
     private:
-        HeapTimer*          heap_timer_;
         typedef std::map<int64_t, void*> LogicDataMap;
-        LogicDataMap logic_data_map_;
-        typedef std::map<int32_t, LogicBase*> LogicMap;
-        LogicMap logic_map_;
+        typedef std::map<int32_t, LogicBase*> LogicTypeMap;
+        typedef std::map<int32_t, size_t> LogicDataSizeMap;
+        HeapTimer*          heap_timer_;
+        LogicDataMap        logic_data_map_;
+        LogicTypeMap        logic_type_map_;
+        LogicDataSizeMap    logic_data_size_map_;
 };
 
 #endif

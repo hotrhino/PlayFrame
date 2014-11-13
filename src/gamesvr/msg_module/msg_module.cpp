@@ -41,17 +41,24 @@ void MsgModule::ModuleInit()
     PCHECK(zmq_connect(datasvr_zmq_sock_, conf_module->config().datasvr_zmq_addr().c_str()) == 0)
         << "zmq_connect error!";
 
+    cmd_logic_type_map_.insert(CmdLogicTypeMap::value_type(
+                ProtoCs::Msg::kQuickRegReqFieldNumber, LOGIC_QUICK_REG));
+    cmd_logic_type_map_.insert(CmdLogicTypeMap::value_type(
+                ProtoCs::Msg::kNormalRegReqFieldNumber, LOGIC_NORMAL_REG));
+    cmd_logic_type_map_.insert(CmdLogicTypeMap::value_type(
+                ProtoCs::Msg::kLoginReqFieldNumber, LOGIC_LOGIN));
+
     // 注册消息处理函数
     REGISTER_MSG_BEGIN(MsgModule, ProtoCs::Msg)
-        REGISTER_MSG(this, ProtoCs::Msg::kQuickRegReqFieldNumber, &MsgModule::OnClientQuickRegReq)
-        REGISTER_MSG(this, ProtoCs::Msg::kNormalRegReqFieldNumber, &MsgModule::OnClientNormalRegReq)
-        REGISTER_MSG(this, ProtoCs::Msg::kLoginReqFieldNumber, &MsgModule::OnClientLoginReq)
+        REGISTER_MSG(this, ProtoCs::Msg::kQuickRegReqFieldNumber, &MsgModule::OnLogicMultiStepStart)
+        REGISTER_MSG(this, ProtoCs::Msg::kNormalRegReqFieldNumber, &MsgModule::OnLogicMultiStepStart)
+        REGISTER_MSG(this, ProtoCs::Msg::kLoginReqFieldNumber, &MsgModule::OnLogicMultiStepStart)
         REGISTER_MSG_END;
 
     REGISTER_MSG_BEGIN(MsgModule, ProtoSs::Msg)
-        REGISTER_MSG(this, ProtoSs::Msg::kAccountRegResFieldNumber, &MsgModule::OnDatasvrAccountRegRes)
-        REGISTER_MSG(this, ProtoSs::Msg::kGetPlayerDataResFieldNumber, &MsgModule::OnDatasvrGetPlayerDataRes)
-        REGISTER_MSG(this, ProtoSs::Msg::kSetPlayerDataResFieldNumber, &MsgModule::OnDatasvrSetPlayerDataRes)
+        REGISTER_MSG(this, ProtoSs::Msg::kAccountRegResFieldNumber, &MsgModule::OnLogicMultiStepResume)
+        REGISTER_MSG(this, ProtoSs::Msg::kGetPlayerDataResFieldNumber, &MsgModule::OnLogicMultiStepResume)
+        REGISTER_MSG(this, ProtoSs::Msg::kSetPlayerDataResFieldNumber, &MsgModule::OnLogicMultiStepResume)
         REGISTER_MSG_END;
 
     LOG(INFO) << ModuleName() << " init ok!";
@@ -66,6 +73,8 @@ void MsgModule::ModuleFini()
         zmq_close(datasvr_zmq_sock_);
     if (zmq_ctx_ != NULL)
         zmq_term(zmq_ctx_);
+
+    cmd_logic_type_map_.clear();
 
     LOG(INFO) << ModuleName() << " fini completed!";
 }
@@ -212,12 +221,17 @@ void MsgModule::Run()
     }
 }
 
-int32_t MsgModule::OnClientQuickRegReq(ProtoCs::Msg* msg, void* args)
+int32_t MsgModule::OnLogicOneStepStart(ProtoCs::Msg* msg, void* args)
 {
     LogicModule* logic_module = FindModule<LogicModule>(app_);
-    int64_t logic_id = logic_module->CreateLogic(LOGIC_QUICK_REG, 10);
+    int32_t logic_type = cmd_logic_type_map_[msg->head().cmd()];
+    LOG(INFO)
+        << "logic_type[" << logic_type
+        << "] name[" << logic_module->GetLogicName(logic_type)
+        << "]";
+    int64_t logic_id = logic_module->CreateLogic(logic_type, 0);
     if (logic_id <= 0) {
-        LOG(ERROR) << "logic_id = " << logic_id << "error"; 
+        LOG(ERROR) << "logic_id = " << logic_id << " error"; 
         return -1;
     }
 
@@ -226,12 +240,17 @@ int32_t MsgModule::OnClientQuickRegReq(ProtoCs::Msg* msg, void* args)
     return 0;
 }
 
-int32_t MsgModule::OnClientNormalRegReq(ProtoCs::Msg* msg, void* args)
+int32_t MsgModule::OnLogicMultiStepStart(ProtoCs::Msg* msg, void* args)
 {
     LogicModule* logic_module = FindModule<LogicModule>(app_);
-    int64_t logic_id = logic_module->CreateLogic(LOGIC_NORMAL_REG, 10);
+    int32_t logic_type = cmd_logic_type_map_[msg->head().cmd()];
+    LOG(INFO)
+        << "logic_type[" << logic_type
+        << "] name[" << logic_module->GetLogicName(logic_type)
+        << "]";
+    int64_t logic_id = logic_module->CreateLogic(logic_type, 10);
     if (logic_id <= 0) {
-        LOG(ERROR) << "logic_id = " << logic_id << "error"; 
+        LOG(ERROR) << "logic_id = " << logic_id << " error"; 
         return -1;
     }
 
@@ -240,37 +259,7 @@ int32_t MsgModule::OnClientNormalRegReq(ProtoCs::Msg* msg, void* args)
     return 0;
 }
 
-int32_t MsgModule::OnClientLoginReq(ProtoCs::Msg* msg, void* args)
-{
-    LogicModule* logic_module = FindModule<LogicModule>(app_);
-    int64_t logic_id = logic_module->CreateLogic(LOGIC_LOGIN, 10);
-    if (logic_id <= 0) {
-        LOG(ERROR) << "logic_id = " << logic_id << "error"; 
-        return -1;
-    }
-
-    logic_module->Proc(logic_id, (void*)msg, args);
-
-    return 0;
-}
-
-int32_t MsgModule::OnDatasvrAccountRegRes(ProtoSs::Msg* msg, void* args)
-{
-    LogicModule* logic_module = FindModule<LogicModule>(app_);
-    int64_t logic_id = msg->head().seq();
-    logic_module->Proc(logic_id, (void*)msg, args);
-    return 0;
-}
-
-int32_t MsgModule::OnDatasvrGetPlayerDataRes(ProtoSs::Msg* msg, void* args)
-{
-    LogicModule* logic_module = FindModule<LogicModule>(app_);
-    int64_t logic_id = msg->head().seq();
-    logic_module->Proc(logic_id, (void*)msg, args);
-    return 0;
-}
-
-int32_t MsgModule::OnDatasvrSetPlayerDataRes(ProtoSs::Msg* msg, void* args)
+int32_t MsgModule::OnLogicMultiStepResume(ProtoSs::Msg* msg, void* args)
 {
     LogicModule* logic_module = FindModule<LogicModule>(app_);
     int64_t logic_id = msg->head().seq();

@@ -78,6 +78,6 @@ ADD_SUBDIRECTORY(common)
 ADD_SUBDIRECTORY(tcpclient)
 ADD_SUBDIRECTORY(connsvr)
 ADD_SUBDIRECTORY(datasvr)
-#ADD_SUBDIRECTORY(gamesvr)
-ADD_SUBDIRECTORY(gamesvr_lua_coroutine)
+ADD_SUBDIRECTORY(gamesvr)
+#ADD_SUBDIRECTORY(gamesvr_lua_coroutine)
 

@@ -33,19 +33,40 @@ void LogicModule::ModuleInit()
     LogicBase* logic = NULL;
 
     logic = new LogicNormalReg();
-    logic_map_.insert(LogicMap::value_type(LOGIC_NORMAL_REG, logic));
+    logic_type_map_.insert(LogicTypeMap::value_type(LOGIC_NORMAL_REG, logic));
+    logic_data_size_map_.insert(LogicDataSizeMap::value_type(
+                LOGIC_NORMAL_REG, sizeof(LogicDataNormalReg)));
 
     logic = new LogicQuickReg();
-    logic_map_.insert(LogicMap::value_type(LOGIC_QUICK_REG, logic));
+    logic_type_map_.insert(LogicTypeMap::value_type(LOGIC_QUICK_REG, logic));
+    logic_data_size_map_.insert(LogicDataSizeMap::value_type(
+                LOGIC_QUICK_REG, sizeof(LogicDataQuickReg)));
 
     logic = new LogicLogin();
-    logic_map_.insert(LogicMap::value_type(LOGIC_LOGIN, logic));
+    logic_type_map_.insert(LogicTypeMap::value_type(LOGIC_LOGIN, logic));
+    logic_data_size_map_.insert(LogicDataSizeMap::value_type(
+                LOGIC_LOGIN, sizeof(LogicDataLogin)));
 
     logic = new LogicUpdatePlayer();
-    logic_map_.insert(LogicMap::value_type(LOGIC_UPDATE_PLAYER, logic));
+    logic_type_map_.insert(LogicTypeMap::value_type(LOGIC_UPDATE_PLAYER, logic));
+    logic_data_size_map_.insert(LogicDataSizeMap::value_type(
+                LOGIC_UPDATE_PLAYER, sizeof(LogicDataUpdatePlayer)));
 
-    for (LogicMap::iterator it = logic_map_.begin(); it != logic_map_.end(); ++it) {
-        LOG(INFO) <<  (it->second)->LogicName();
+    LOG(INFO) << "All Logic:";
+    for (LogicTypeMap::const_iterator it = logic_type_map_.begin(); it != logic_type_map_.end(); ++it) {
+        LOG(INFO)
+            << "logic_type[" << it->first
+            << "] <---> [" << (it->second)->LogicName()
+            << "]";
+    }
+
+    LOG(INFO) << "All LogicDataSize:";
+    for (LogicDataSizeMap::const_iterator it = logic_data_size_map_.begin();
+            it != logic_data_size_map_.end(); ++it) {
+        LOG(INFO)
+            << "logic_type[" << it->first
+            << "] <---> logic_data_size[" << it->second
+            << "]";
     }
 
     LOG(INFO) << ModuleName() << " init ok!";
@@ -59,7 +80,8 @@ void LogicModule::ModuleFini()
     }
 
     logic_data_map_.clear();
-    logic_map_.clear();
+    logic_type_map_.clear();
+    logic_data_size_map_.clear();
 
     LOG(INFO) << ModuleName() << " fini completed!";
 }
@@ -89,29 +111,28 @@ AppModuleBase* LogicModule::CreateModule(App* app)
 int64_t LogicModule::CreateLogic(int32_t logic_type, time_t task_delay_secs)
 {
     void* logic_data = NULL;
-    switch (logic_type) {
-        case LOGIC_NORMAL_REG:
-            logic_data = malloc(sizeof(LogicDataNormalReg));
-            break;
-        case LOGIC_QUICK_REG:
-            logic_data = malloc(sizeof(LogicDataQuickReg));
-            break;
-        case LOGIC_LOGIN:
-            logic_data = malloc(sizeof(LogicDataLogin));
-            break;
-        case LOGIC_UPDATE_PLAYER:
-            logic_data = malloc(sizeof(LogicDataUpdatePlayer));
-            break;
+    LogicDataSizeMap::const_iterator it = logic_data_size_map_.find(logic_type);
+    if (it == logic_data_size_map_.end()) {
+        LOG(ERROR) << "can't find logic_type["
+            << logic_type
+            << "]"; 
+        return -1;
     }
 
-    if (logic_data == NULL)
-        return 0;
+    logic_data = malloc(it->second);
 
-    int64_t logic_id = heap_timer_->RegisterTimer(
-            TimeValue(task_delay_secs),
-            TimeValue(task_delay_secs),
-            this,
-            NULL);
+    if (logic_data == NULL)
+        return -1;
+
+    // 等待时间为0为即时任务, 不需要注册定时器
+    int64_t logic_id = 0;
+    if (task_delay_secs > 0) {
+        logic_id = heap_timer_->RegisterTimer(
+                TimeValue(task_delay_secs),
+                TimeValue(task_delay_secs),
+                this,
+                NULL);
+    }
     LogicDataHead* logic_data_head = (LogicDataHead*)logic_data;
     logic_data_head->logic_id = logic_id;
     logic_data_head->logic_type = logic_type;
@@ -135,8 +156,8 @@ void LogicModule::Proc(int64_t logic_id, void* msg, void* args)
         << "logic_data_head->logic_type["
         << logic_data_head->logic_type
         << "]";
-    LogicMap::iterator it = logic_map_.find(logic_data_head->logic_type);
-    if (it == logic_map_.end()) {
+    LogicTypeMap::const_iterator it = logic_type_map_.find(logic_data_head->logic_type);
+    if (it == logic_type_map_.end()) {
         LOG(ERROR) << "can't find logic_type["
             << logic_data_head->logic_type
             << "]"; 
@@ -153,7 +174,42 @@ void LogicModule::Proc(int64_t logic_id, void* msg, void* args)
         LOG(INFO) << (it->second)->LogicName() << " finish!"; 
 
     if (ret != LOGIC_YIELD) {
-        DeleteLogic(logic_id);
-        heap_timer_->UnregisterTimer(logic_id);
+        DeleteLogicData(logic_id);
+        if (logic_id != 0)
+            heap_timer_->UnregisterTimer(logic_id);
     }
+}
+
+void LogicModule::DeleteLogicData(int64_t logic_id)
+{
+    LogicDataMap::iterator it = logic_data_map_.find(logic_id);
+    if (it != logic_data_map_.end()) {
+        LogicDataHead* head = (LogicDataHead*)(it->second);
+        LOG(INFO)
+            << "delete logic_id[" << head->logic_id
+            << "] logic_type[" << head->logic_type
+            << "] step[" << head->step
+            << "]";
+        free(it->second);
+        it->second = NULL;
+        logic_data_map_.erase(it);
+    }
+}
+
+void* LogicModule::GetLogicData(int64_t logic_id)
+{
+    LogicDataMap::iterator it = logic_data_map_.find(logic_id);
+    if (it != logic_data_map_.end())
+        return it->second;
+
+    return NULL;
+}
+
+const char* LogicModule::GetLogicName(int32_t logic_type)
+{
+    LogicTypeMap::const_iterator it = logic_type_map_.find(logic_type);
+    if (it != logic_type_map_.end()) {
+        return (it->second)->LogicName();
+    }
+    return NULL;
 }

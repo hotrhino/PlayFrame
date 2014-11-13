@@ -77,21 +77,16 @@ class MsgModule : public AppModuleBase,
 
     private:
         int32_t OnConnProcess(ProtoCs::Msg* msg, void* args);
-
-        // client 交互
-        int32_t OnClientQuickRegReq(ProtoCs::Msg* msg, void* args);
-        int32_t OnClientNormalRegReq(ProtoCs::Msg* msg, void* args);
-        int32_t OnClientLoginReq(ProtoCs::Msg* msg, void* args);
-
-        // datasvr 交互
-        int32_t OnDatasvrAccountRegRes(ProtoSs::Msg* msg, void* args);
-        int32_t OnDatasvrGetPlayerDataRes(ProtoSs::Msg* msg, void* args);
-        int32_t OnDatasvrSetPlayerDataRes(ProtoSs::Msg* msg, void* args);
+        int32_t OnLogicOneStepStart(ProtoCs::Msg* msg, void* args);
+        int32_t OnLogicMultiStepStart(ProtoCs::Msg* msg, void* args);
+        int32_t OnLogicMultiStepResume(ProtoSs::Msg* msg, void* args);
 
     private:
+        typedef std::map<int32_t, int32_t> CmdLogicTypeMap;
         void*           zmq_ctx_;
         void*           connsvr_zmq_sock_;
         void*           datasvr_zmq_sock_;
+        CmdLogicTypeMap cmd_logic_type_map_;
 };
 
 #endif 

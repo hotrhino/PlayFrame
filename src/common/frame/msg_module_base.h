@@ -68,8 +68,8 @@ public:
     template<typename T>
     int32_t HandleRequest(const char* pkg_buf, const size_t pkg_len, void* data)
     {
-        static T msg;        
-    
+        static T msg;
+
         msg.Clear();
 
         // Protobuf½âÎö
