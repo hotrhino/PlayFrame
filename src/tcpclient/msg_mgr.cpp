@@ -24,10 +24,10 @@ int32_t MsgMgr::Init()
 
     conn_cache_.Init();
 
-	sock_ = socket(AF_INET, SOCK_STREAM, 0);
-	if (sock_ == INVALID_SOCKET) {
-		return -1;
-	}
+    sock_ = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock_ == INVALID_SOCKET) {
+        return -1;
+    }
 
     int ret = ConnectServer("10.211.55.22", 8810);
     if (ret != 0) {
@@ -35,14 +35,14 @@ int32_t MsgMgr::Init()
     }
 
     free_seq_ = 10000;
-    
+
     // 注册消息
     REGISTER_MSG(this, ProtoCs::Msg::kLoginReqFieldNumber, &MsgMgr::DoLogin,
-        ProtoCs::Msg::kLoginResFieldNumber, &MsgMgr::OnLogin);
+            ProtoCs::Msg::kLoginResFieldNumber, &MsgMgr::OnLogin);
     REGISTER_MSG(this, ProtoCs::Msg::kNormalRegReqFieldNumber, &MsgMgr::DoNormalReg,
-        ProtoCs::Msg::kNormalRegResFieldNumber, &MsgMgr::OnNormalReg);
+            ProtoCs::Msg::kNormalRegResFieldNumber, &MsgMgr::OnNormalReg);
     REGISTER_MSG(this, ProtoCs::Msg::kQuickRegReqFieldNumber, &MsgMgr::DoQuickReg,
-        ProtoCs::Msg::kQuickRegResFieldNumber, &MsgMgr::OnQuickReg);
+            ProtoCs::Msg::kQuickRegResFieldNumber, &MsgMgr::OnQuickReg);
 
     return 0;
 }
@@ -127,24 +127,24 @@ void MsgMgr::FreeMap()
 
 int MsgMgr::ConnectServer(const char* ip, unsigned short port)
 {
-	struct sockaddr_in svraddr;
-	svraddr.sin_family = AF_INET;
-	svraddr.sin_addr.s_addr = inet_addr(ip);
-	svraddr.sin_port = htons(port);
+    struct sockaddr_in svraddr;
+    svraddr.sin_family = AF_INET;
+    svraddr.sin_addr.s_addr = inet_addr(ip);
+    svraddr.sin_port = htons(port);
 
-	int ret = connect(sock_, (struct sockaddr*)&svraddr, sizeof(svraddr));
-	if(ret == SOCKET_ERROR) {
+    int ret = connect(sock_, (struct sockaddr*)&svraddr, sizeof(svraddr));
+    if(ret == SOCKET_ERROR) {
         errno_ = ERR_UNCONNECT;
         return -1;        
-	}
-    
+    }
+
 #ifdef WIN32
-	u_long arg = 1;
-	if (ioctlsocket(sock_, FIONBIO, &arg) != NO_ERROR) {
+    u_long arg = 1;
+    if (ioctlsocket(sock_, FIONBIO, &arg) != NO_ERROR) {
         CloseSock();
         errno_ = ERR_UNCONNECT;
-		return -1; 
-	}
+        return -1; 
+    }
 #else
     // 非windows下设置非阻塞处理模式
     SetNonBlock();
@@ -152,7 +152,7 @@ int MsgMgr::ConnectServer(const char* ip, unsigned short port)
 #endif
 
     errno_ = ERR_OK;
-	return 0;
+    return 0;
 }
 
 int MsgMgr::SetNonBlock()
@@ -287,9 +287,9 @@ int MsgMgr::CloseSock()
 {
     int ret = 0;
 #ifdef WIN32
-	ret = (closesocket(sock_));
+    ret = (closesocket(sock_));
 #else
-	ret = (close(sock_));
+    ret = (close(sock_));
 #endif
     errno_ = ERR_UNCONNECT;
     sock_ = 0;
@@ -298,19 +298,19 @@ int MsgMgr::CloseSock()
 
 int MsgMgr::DnsParse(const char* domain, char* ip)
 {
-	struct hostent* p;
-	if ((p = gethostbyname(domain)) == NULL) {
-		return -1;
+    struct hostent* p;
+    if ((p = gethostbyname(domain)) == NULL) {
+        return -1;
     }
-		
-	sprintf(ip, 
-		"%u.%u.%u.%u",
-		(unsigned char)p->h_addr_list[0][0], 
-		(unsigned char)p->h_addr_list[0][1], 
-		(unsigned char)p->h_addr_list[0][2], 
-		(unsigned char)p->h_addr_list[0][3]);
-	
-	return 0;
+
+    sprintf(ip, 
+            "%u.%u.%u.%u",
+            (unsigned char)p->h_addr_list[0][0], 
+            (unsigned char)p->h_addr_list[0][1], 
+            (unsigned char)p->h_addr_list[0][2], 
+            (unsigned char)p->h_addr_list[0][3]);
+
+    return 0;
 }
 
 int MsgMgr::Resume()
@@ -401,8 +401,8 @@ int32_t MsgMgr::OnQuickReg(ProtoCs::Msg* msg, void* args)
     if (msg_ret == 0) {
         printf("QuickReg ok!\n");
         printf("account [%s] password[%s]\n", 
-            msg->quick_reg_res().account().c_str(),
-            msg->quick_reg_res().password().c_str());
+                msg->quick_reg_res().account().c_str(),
+                msg->quick_reg_res().password().c_str());
     } else {
         printf("QuickReg failed!\n");
     }

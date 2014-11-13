@@ -7,11 +7,11 @@
  */
 #include "shm_memory.h"
 
-ShmMemory::ShmMemory(bool verify)
-    : verify_(verify),
-      shm_head_(NULL),
-      pool_size_(0),
-      base_addr_(NULL)
+ShmMemory::ShmMemory(bool verify) :
+    verify_(verify),
+    shm_head_(NULL),
+    pool_size_(0),
+    base_addr_(NULL)
 {}
 
 ShmMemory::~ShmMemory()
@@ -19,13 +19,13 @@ ShmMemory::~ShmMemory()
     if(shm_head_ != NULL)
     {
         shmdt((const void*)shm_head_);
-		shm_head_ = NULL;
+        shm_head_ = NULL;
         base_addr_ = NULL;
     }
 }
 
 void* ShmMemory::Init(key_t shm_key, int32_t chk_id,
-    int32_t alloc_size, int32_t& first_time)
+        int32_t alloc_size, int32_t& first_time)
 {
     int32_t page_size = getpagesize();
     alloc_size += sizeof(SHM_HEAD);
@@ -44,7 +44,7 @@ void* ShmMemory::Init(key_t shm_key, int32_t chk_id,
         shm_head_ = (SHM_HEAD*)shmat(shm_id, 0, 0);
 
         if(verify_ && shm_head_->shm_key != shm_key
-            && shm_head_->chk_id != chk_id) {
+                && shm_head_->chk_id != chk_id) {
             shmdt((const void* )shm_head_);
             shm_head_ = NULL;
             return NULL;

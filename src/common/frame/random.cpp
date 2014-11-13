@@ -13,8 +13,8 @@ const int32_t Random::Q = Random::M / Random::A;
 const int32_t Random::R = Random::M % Random::A;
 
 
-Random::Random(int32_t seed)
-    : seed_(seed)
+    Random::Random(int32_t seed)
+: seed_(seed)
 {
     if(seed_ == 0)
         seed_ = time(NULL);

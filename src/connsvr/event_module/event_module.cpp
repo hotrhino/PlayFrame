@@ -11,16 +11,19 @@
 #include "conn_mgr_module.h"
 #include "cs_msg.pb.h"
 
-EventModule::EventModule(App* app)
-	: AppModuleBase(app),
-      zmq_ctx_(NULL),
-	  zmq_sock_(NULL),
-      zmq_pair_fd_(0),
-      listen_fd_(0)
-{}
+EventModule::EventModule(App* app) :
+    AppModuleBase(app),
+    zmq_ctx_(NULL),
+    zmq_sock_(NULL),
+    zmq_pair_fd_(0),
+    listen_fd_(0),
+    epoller_(NULL)
+{
+}
 
 EventModule::~EventModule()
-{}
+{
+}
 
 void EventModule::ModuleInit()
 {
@@ -59,13 +62,13 @@ void EventModule::ModuleInit()
     int32_t conn_pool_size = conf_module->config().conn_pool_size();
     epoller_ = new Epoller();
     epoller_->Init(conn_pool_size);
-    
+
     // 增加tcp accept事件
     int ret = epoller_->AddEvent(listen_fd_, EVENT_READ, EventModule::DoTcpAccept, (void*)epoller_);
     CHECK(ret == 0)
         << "epoller_.AddEvent error.";
 
-	LOG(INFO) << ModuleName() << " init ok!";
+    LOG(INFO) << ModuleName() << " init ok!";
 }
 
 void EventModule::ModuleFini()
@@ -79,28 +82,28 @@ void EventModule::ModuleFini()
 
     delete(epoller_);
 
-	LOG(INFO) << ModuleName() << " fini completed!";
+    LOG(INFO) << ModuleName() << " fini completed!";
 }
 
 const char* EventModule::ModuleName() const
 {
-	static const std::string ModuleName = "EventModule";
-	return ModuleName.c_str();
+    static const std::string ModuleName = "EventModule";
+    return ModuleName.c_str();
 }
 
 int32_t EventModule::ModuleId()
 {
-	return MODULE_ID_EVENT;
+    return MODULE_ID_EVENT;
 }
 
 AppModuleBase* EventModule::CreateModule(App* app)
 {
-	EventModule* event_module = new EventModule(app);
-	if (event_module != NULL) {
+    EventModule* event_module = new EventModule(app);
+    if (event_module != NULL) {
         event_module->ModuleInit();
-	}
+    }
 
-	return static_cast<AppModuleBase*>(event_module);
+    return static_cast<AppModuleBase*>(event_module);
 }
 
 void EventModule::Run()
@@ -130,7 +133,7 @@ void EventModule::DoTcpAccept(int listen_fd, void* arg)
     int32_t conn_fd = accept(listen_fd, (struct sockaddr*)&sin, &len);
     if (conn_fd < 0) {
         if (errno != EAGAIN && errno != ECONNABORTED
-            && errno != EPROTO && errno != EINTR) {
+                && errno != EPROTO && errno != EINTR) {
             PLOG(ERROR) << "accept";
         }
         return;
@@ -217,7 +220,7 @@ void EventModule::DoTcpRead(int conn_fd, void* arg)
 
         if (msg_len > PKG_BUF_SIZE) {
             LOG(ERROR)
-               << "msg_len > PKG_BUF_SIZE"; 
+                << "msg_len > PKG_BUF_SIZE"; 
             return;
         }
 
@@ -306,7 +309,7 @@ void EventModule::ZmqReadLoop()
         int32_t send_len = sizeof(uint16_t) + msg_len;
         if (msg_len > PKG_BUF_SIZE) {
             LOG(ERROR)
-               << "msg_len > PKG_BUF_SIZE"; 
+                << "msg_len > PKG_BUF_SIZE"; 
             return;
         }
         p += sizeof(uint16_t);

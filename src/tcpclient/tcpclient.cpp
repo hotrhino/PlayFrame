@@ -18,12 +18,11 @@ int main()
         exit(0);
     }
 
+    //msg_mgr.DispatchReqMsg(ProtoCs::Msg::kNormalRegReqFieldNumber);
     //msg_mgr.DispatchReqMsg(ProtoCs::Msg::kQuickRegReqFieldNumber);
-    //MsgMgr::GetInstance().DispatchReqMsg(ProtoCs::Msg::kNormalRegReqFieldNumber);
-    //MsgMgr::GetInstance().DispatchReqMsg(ProtoCs::Msg::kLoginReqFieldNumber);
+    msg_mgr.DispatchReqMsg(ProtoCs::Msg::kLoginReqFieldNumber);
 
     while(1) {
-        msg_mgr.DispatchReqMsg(ProtoCs::Msg::kQuickRegReqFieldNumber);
         msg_mgr.Run();
         sleep(1);
     }

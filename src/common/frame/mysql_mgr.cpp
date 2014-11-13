@@ -7,7 +7,7 @@
  */
 #include "mysql_mgr.h"
 
-template <typename TYPE, void (TYPE::*thread_routine)() >
+    template <typename TYPE, void (TYPE::*thread_routine)() >
 void* _thread_t(void* args)
 {
     TYPE* This = (TYPE*)args;
@@ -48,11 +48,11 @@ MysqlClient::~MysqlClient()
 }
 
 void MysqlClient::Init(int32_t client_id,
-                       MysqlMgr* mgr,
-                       const std::string& host,
-                       const std::string& user,
-                       const std::string& password,
-                       const std::string& dbname)
+        MysqlMgr* mgr,
+        const std::string& host,
+        const std::string& user,
+        const std::string& password,
+        const std::string& dbname)
 {
     client_id_ = client_id;
     mgr_ = mgr;
@@ -80,7 +80,7 @@ void MysqlClient::Process(const std::string& sql, MysqlResCallback callback, uin
 
     sql_ = sql;
     callback_ = callback,
-    seq_id_ = seq_id;
+              seq_id_ = seq_id;
     player_idx_ = player_idx;
 
     write(pipefd_[1], "", 1);
@@ -214,8 +214,8 @@ int32_t MysqlClient::Connect()
     }
 
     if (mysql_real_connect(&conn_, host_.c_str(),
-        user_.c_str(), password_.c_str(),
-        dbname_.c_str(), 0, NULL, 0) == NULL) {
+                user_.c_str(), password_.c_str(),
+                dbname_.c_str(), 0, NULL, 0) == NULL) {
         LOG(ERROR)
             << "client[" << client_id_
             << "] mysql_real_Connect error["
@@ -255,17 +255,17 @@ MysqlMgr::MysqlMgr() :
 MysqlMgr::~MysqlMgr()
 {
     for (MysqlClientList::iterator it = total_client_list_.begin();
-         it != total_client_list_.end(); ++it) {
+            it != total_client_list_.end(); ++it) {
         delete *it;
     }
     LOG(INFO) << "MysqlMgr fini ok";
 }
 
 void MysqlMgr::Init(int32_t max_client_count,
-                    const std::string& host,
-                    const std::string& user,
-                    const std::string& password,
-                    const std::string& dbname)
+        const std::string& host,
+        const std::string& user,
+        const std::string& password,
+        const std::string& dbname)
 {
     host_ = host;
     user_ = user;

@@ -31,39 +31,39 @@ typedef struct tagEpollEventLoop {
 } EpollEventLoop;
 
 class Epoller {
-public:
-    Epoller() { ev_loop_ = NULL; };
-    virtual ~Epoller () { ClearEpoller(); }
+    public:
+        Epoller() { ev_loop_ = NULL; };
+        virtual ~Epoller () { ClearEpoller(); }
 
-    void Init(int max_events_size);
-    int AddEvent(int fd, int mask, FileProc* proc, void* client_data);
-    void DelEvent(int fd, int mask);
-    void ClearEvent(int fd) { DelEvent(fd, EVENT_READ | EVENT_WRITE); }
-    void Loop(int timeout = 1);
+        void Init(int max_events_size);
+        int AddEvent(int fd, int mask, FileProc* proc, void* client_data);
+        void DelEvent(int fd, int mask);
+        void ClearEvent(int fd) { DelEvent(fd, EVENT_READ | EVENT_WRITE); }
+        void Loop(int timeout = 1);
 
-    static void SetNonBlock(int32_t fd);
-    static void SetSocketOpt(int32_t fd);
+        static void SetNonBlock(int32_t fd);
+        static void SetSocketOpt(int32_t fd);
 
-private:
-    void ClearEpoller() 
-    {
-        if (ev_loop_ != NULL) {
-            close(ev_loop_->epfd_);
-            ev_loop_->epfd_ = 0;
+    private:
+        void ClearEpoller() 
+        {
+            if (ev_loop_ != NULL) {
+                close(ev_loop_->epfd_);
+                ev_loop_->epfd_ = 0;
 
-            free(ev_loop_->epoll_events_);
-            ev_loop_->epoll_events_ = NULL;
+                free(ev_loop_->epoll_events_);
+                ev_loop_->epoll_events_ = NULL;
 
-            free(ev_loop_->file_events_);
-            ev_loop_->file_events_ = NULL;
+                free(ev_loop_->file_events_);
+                ev_loop_->file_events_ = NULL;
 
-            free(ev_loop_);
-            ev_loop_ = NULL;
+                free(ev_loop_);
+                ev_loop_ = NULL;
+            }
         }
-    }
 
-private:
-    EpollEventLoop* ev_loop_;
+    private:
+        EpollEventLoop* ev_loop_;
 };
 
 #endif

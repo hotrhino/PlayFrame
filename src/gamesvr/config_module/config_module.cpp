@@ -8,9 +8,9 @@
 #include "config_module.h"
 #include "app.h"
 
-ConfigModule::ConfigModule(App* app, const char* conf_file)
-	: AppModuleBase(app),
-      conf_file_(conf_file)
+ConfigModule::ConfigModule(App* app, const char* conf_file) :
+    AppModuleBase(app),
+    conf_file_(conf_file)
 {
     app_ = app;
 }
@@ -31,32 +31,32 @@ void ConfigModule::ModuleInit()
         << "config: protobuf textformat parse failed!";
 
     LOG(INFO) << config_.Utf8DebugString();
-	LOG(INFO) << ModuleName() << " init ok!";
+    LOG(INFO) << ModuleName() << " init ok!";
 }
 
 void ConfigModule::ModuleFini()
 {
-	LOG(INFO) << ModuleName() << " fini completed!";
+    LOG(INFO) << ModuleName() << " fini completed!";
 }
 
 const char* ConfigModule::ModuleName() const
 {
-	static const std::string ModuleName = "ConfigModule";
-	return ModuleName.c_str();
+    static const std::string ModuleName = "ConfigModule";
+    return ModuleName.c_str();
 }
 
 int32_t ConfigModule::ModuleId()
 {
-	return MODULE_ID_CONFIG;
+    return MODULE_ID_CONFIG;
 }
 
 AppModuleBase* ConfigModule::CreateModule(App* app, const char* conf_file)
 {
-	ConfigModule* module = new ConfigModule(app, conf_file);
-	if (module != NULL) {
+    ConfigModule* module = new ConfigModule(app, conf_file);
+    if (module != NULL) {
         module->ModuleInit();
-	}
+    }
 
-	return static_cast<AppModuleBase*>(module);
+    return static_cast<AppModuleBase*>(module);
 }
 

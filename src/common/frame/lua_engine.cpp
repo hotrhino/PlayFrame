@@ -7,8 +7,10 @@
  */
 #include "lua_engine.h"
 
-LuaEngine::LuaEngine()
-    :master_state_(NULL), heap_timer_(NULL), rand_maker_(0)
+LuaEngine::LuaEngine() :
+    master_state_(NULL),
+    heap_timer_(NULL),
+    rand_maker_(0)
 {
 }
 
@@ -147,10 +149,10 @@ int64_t LuaEngine::CreateTask(const char* lua_func, time_t task_delay_secs)
     PrintMemSize("before create_task");
     // 分配定时器
     int64_t task_id = heap_timer_->RegisterTimer(
-        TimeValue(task_delay_secs),
-        TimeValue(task_delay_secs),
-        this,
-        NULL);
+            TimeValue(task_delay_secs),
+            TimeValue(task_delay_secs),
+            this,
+            NULL);
 
     // task_id 分配失败
     if (task_id <= 0) {
@@ -235,10 +237,10 @@ void LuaEngine::PrintMemSize(const char* extra)
     mem_kb = mem_kb - (mem_m << 10);
 
     LOG(INFO) << "[LUA-MEM] ["
-            << mem_m << "M "
-            << mem_kb << "KB "
-            << mem_b << "B]. "
-            << extra;
+        << mem_m << "M "
+        << mem_kb << "KB "
+        << mem_b << "B]. "
+        << extra;
 }
 
 void LuaEngine::LuaGarbageCollect()

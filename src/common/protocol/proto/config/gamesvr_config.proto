@@ -8,5 +8,6 @@ message GameSvr {
     optional int32 city_pool_size = 5 [default = 100];
     optional string connsvr_zmq_addr = 6;
     optional string datasvr_zmq_addr = 7;
+    optional int32 logic_timer_init_size = 8 [default = 0];
 }
 

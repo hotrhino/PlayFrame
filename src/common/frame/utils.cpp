@@ -16,7 +16,7 @@ uint64_t Utils::Fnv64aHash(const char* buf, size_t len)
     while (bp < be) {
         hval ^= (uint64_t) *bp++;
         hval += (hval << 1) + (hval << 4) + (hval << 5) +
-                (hval << 7) + (hval << 8) + (hval << 40);
+            (hval << 7) + (hval << 8) + (hval << 40);
     }
 
     return hval;
@@ -31,7 +31,7 @@ uint64_t Utils::Rdtsc()
     __asm__ volatile ("rdtsc" : "=a" (low), "=d" (high));
     return (uint64_t) high << 32 | low;
 #elif (defined __SUNPRO_CC && (__SUNPRO_CC >= 0x5100) && (defined __i386 || \
-    defined __amd64 || defined __x86_64))
+            defined __amd64 || defined __x86_64))
     union {
         uint64_t u64val;
         uint32_t u32val [2];
@@ -88,9 +88,9 @@ int32_t Utils::CheckAccount(const char* account, int32_t len)
     int32_t i = 0;
     // 首字母必须为字母
     if (account[i] < 'A' ||
-        (account[i] > 'Z' && account[i] < 'a') ||
-        account[i] >'z')
-    return -2;
+            (account[i] > 'Z' && account[i] < 'a') ||
+            account[i] >'z')
+        return -2;
 
     for (i = 1; i < len; i++) {
         if (account[i] < '0' ||

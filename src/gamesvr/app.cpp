@@ -10,7 +10,7 @@
 #include "timer_mgr_module.h"
 #include "msg_module.h"
 #include "obj_mgr_module.h"
-#include "lua_engine_module.h"
+#include "logic_module.h"
 
 ServerFrame g_server("0.0.1");
 ServerFrame* g_svr_frame = &g_server;
@@ -55,20 +55,21 @@ int32_t App::AppInit()
     app_module = ObjMgrModule::CreateModule(this);
     AddModule(ObjMgrModule::ModuleId(), app_module);
 
-    app_module = LuaEngineModule::CreateModule(this, g_svr_frame->script_name_);
-    AddModule(LuaEngineModule::ModuleId(), app_module);
+    app_module = LogicModule::CreateModule(this);
+    AddModule(LogicModule::ModuleId(), app_module);
 
     LOG(INFO) << AppName() << " init succeed!";
     return 0;
 }
 
 int32_t App::AppRun()
-{    
+{
     static MsgModule* msg_module = GetModule<MsgModule>();
-    static LuaEngineModule* lua_engine_module = GetModule<LuaEngineModule>();
+    static LogicModule* logic_module = GetModule<LogicModule>();
 
     msg_module->Run();
-    lua_engine_module->Run();
+    logic_module->Update();
+
     return 0;
 }
 
@@ -79,7 +80,5 @@ void App::AppClean()
 
 void App::AppReload()
 {
-    static LuaEngineModule* lua_engine_module = GetModule<LuaEngineModule>();
-    lua_engine_module->Reload();
 }
 

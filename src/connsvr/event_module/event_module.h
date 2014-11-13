@@ -12,45 +12,45 @@
 
 class EventModule : public AppModuleBase
 {
-public:
-    DISALLOW_COPY_AND_ASSIGN(EventModule);
+    public:
+        DISALLOW_COPY_AND_ASSIGN(EventModule);
 
-	EventModule(App* app);
-	virtual ~EventModule();
+        EventModule(App* app);
+        virtual ~EventModule();
 
-	virtual void            ModuleInit();
-	virtual void            ModuleFini();
-	virtual const char*     ModuleName() const;
-	static int32_t          ModuleId();
-	static AppModuleBase*   CreateModule(App* app);
+        virtual void            ModuleInit();
+        virtual void            ModuleFini();
+        virtual const char*     ModuleName() const;
+        static int32_t          ModuleId();
+        static AppModuleBase*   CreateModule(App* app);
 
-public:
-    void Run();
+    public:
+        void Run();
 
-    inline void* zmq_sock() const
-    {
-        return zmq_sock_;
-    }
+        inline void* zmq_sock() const
+        {
+            return zmq_sock_;
+        }
 
-    inline int32_t zmq_pair_fd() const
-    {
-        return zmq_pair_fd_;
-    }
+        inline int32_t zmq_pair_fd() const
+        {
+            return zmq_pair_fd_;
+        }
 
-private:
-    static void DoTcpAccept(int fd, void* arg);
-    static void DoTcpRead(int fd, void* arg);
-    static void DoTcpWrite(int fd, void* arg);
-    static void SendConnStop(void* zmq_sock, int32_t player_idx);
-    void ZmqReadLoop();
+    private:
+        static void DoTcpAccept(int fd, void* arg);
+        static void DoTcpRead(int fd, void* arg);
+        static void DoTcpWrite(int fd, void* arg);
+        static void SendConnStop(void* zmq_sock, int32_t player_idx);
+        void ZmqReadLoop();
 
-private:
-    void*               zmq_ctx_;
-    void*               zmq_sock_;
-    int32_t             zmq_pair_fd_;
-    int32_t             listen_fd_;
+    private:
+        void*               zmq_ctx_;
+        void*               zmq_sock_;
+        int32_t             zmq_pair_fd_;
+        int32_t             listen_fd_;
 
-    Epoller*            epoller_;
+        Epoller*            epoller_;
 };
 
 #endif // _EVENT_MODULE_H_

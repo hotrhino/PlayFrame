@@ -49,99 +49,99 @@ class AppBase;
 
 class AppModuleBase
 {
-public:
-    explicit AppModuleBase(AppBase* app) : app_(app) {}
-    virtual ~AppModuleBase() {};
-    virtual void ModuleInit() = 0;
-    virtual void ModuleFini() = 0;
-    virtual const char* ModuleName() const = 0;
+    public:
+        explicit AppModuleBase(AppBase* app) : app_(app) {}
+        virtual ~AppModuleBase() {};
+        virtual void ModuleInit() = 0;
+        virtual void ModuleFini() = 0;
+        virtual const char* ModuleName() const = 0;
 
-    AppBase* app_;
+        AppBase* app_;
 };
 
 class AppBase
 {
-public:
-    DISALLOW_COPY_AND_ASSIGN(AppBase);
+    public:
+        DISALLOW_COPY_AND_ASSIGN(AppBase);
 
-    AppBase() {}
+        AppBase() {}
 
-    virtual ~AppBase() {}; 
+        virtual ~AppBase() {}; 
 
-    // 子类实现
-    virtual int32_t AppInit() = 0;
-    virtual const char* AppName() const = 0;
-    virtual int32_t AppRun() = 0;
-    static AppBase* GetInstance();
+        // 子类实现
+        virtual int32_t AppInit() = 0;
+        virtual const char* AppName() const = 0;
+        virtual int32_t AppRun() = 0;
+        static AppBase* GetInstance();
 
-    virtual void AppStop()
-    {
-        if(module_map_.empty())
-            return;
+        virtual void AppStop()
+        {
+            if(module_map_.empty())
+                return;
 
-        LOG(INFO) << AppName() << " now stoping";
+            LOG(INFO) << AppName() << " now stoping";
 
-        //按创建相反的顺序来析构，从而可以解决析构中有相互依赖的情况
-        ModuleMap::const_reverse_iterator it = module_map_.rbegin();
-        while (it != module_map_.rend()) {
-            AppModuleBase* temp = it->second;
-            if (temp != NULL) {
-                temp->ModuleFini();
-                delete temp;
-                temp = NULL;
+            //按创建相反的顺序来析构，从而可以解决析构中有相互依赖的情况
+            ModuleMap::const_reverse_iterator it = module_map_.rbegin();
+            while (it != module_map_.rend()) {
+                AppModuleBase* temp = it->second;
+                if (temp != NULL) {
+                    temp->ModuleFini();
+                    delete temp;
+                    temp = NULL;
+                }
+                ++it;
             }
-            ++it;
+
+            module_map_.clear();
+
+            LOG(INFO) << AppName() << " stop completed!";
+            sleep(1);
         }
 
-        module_map_.clear();
+        virtual void AppReload()
+        {
+            LOG(INFO) << " AppBase recv reload signal!";
+        }
 
-        LOG(INFO) << AppName() << " stop completed!";
-        sleep(1);
-    }
+        virtual void AppClean()
+        {
+            LOG(INFO) << " AppBase recv clean signal!";
+        }
 
-    virtual void AppReload()
-    {
-        LOG(INFO) << " AppBase recv reload signal!";
-    }
+        void AddModule(uint64_t module_id, AppModuleBase* app_module) {
+            module_map_[module_id] = app_module;
+        }
 
-    virtual void AppClean()
-    {
-        LOG(INFO) << " AppBase recv clean signal!";
-    }
+        AppModuleBase* FindModule(int32_t module_id) const
+        {
+            AppModuleBase* module;
+            ModuleMap::const_iterator it = module_map_.find(module_id);
+            if (it == module_map_.end())
+                module = NULL;
+            else
+                module = it->second;
 
-    void AddModule(uint64_t module_id, AppModuleBase* app_module) {
-        module_map_[module_id] = app_module;
-    }
+            CHECK(module != NULL)
+                << "module[" << module_id
+                << "]  not register!";
+            return module;
+        }
 
-    AppModuleBase* FindModule(int32_t module_id) const
-    {
-        AppModuleBase* module;
-        ModuleMap::const_iterator it = module_map_.find(module_id);
-        if(it == module_map_.end())
-            module = NULL;
-        else
-            module = it->second;
+        template<typename T>
+            T* GetModule() const {
+                ModuleMap::const_iterator it = module_map_.find(T::ModuleId());
+                CHECK(it != module_map_.end())
+                    << "get_module error!";
+                return dynamic_cast<T*>(it->second);
+            }
 
-        CHECK(module != NULL)
-            << "module[" << module_id
-            << "]  not register!";
-        return module;
-    }
-
-    template<typename T>
-    T* GetModule() const {
-        ModuleMap::const_iterator it = module_map_.find(T::ModuleId());
-        CHECK(it != module_map_.end())
-            << "get_module error!";
-        return dynamic_cast<T*>(it->second);
-    }
-
-private:
-    typedef std::map<uint64_t, AppModuleBase*> ModuleMap;
-    ModuleMap module_map_;
+    private:
+        typedef std::map<uint64_t, AppModuleBase*> ModuleMap;
+        ModuleMap module_map_;
 };
 
-template<class T>
+    template<class T>
 T* FindModule(const AppBase* app_base)
 {
     AppModuleBase* module = app_base->FindModule(T::ModuleId());

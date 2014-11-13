@@ -125,7 +125,7 @@ const char* TimeValue::TimeName(time_t t)
 {
     static char time_stamp[64] = {0};
     strftime(time_stamp, sizeof(time_stamp),
-        "%m-%d-%Y %H:%M:%S", localtime(&t));
+            "%m-%d-%Y %H:%M:%S", localtime(&t));
     return (const char*)time_stamp;
 }
 
@@ -146,7 +146,7 @@ uint64_t TimeValue::Rdtsc()
     __asm__ volatile ("rdtsc" : "=a" (low), "=d" (high));
     return (uint64_t) high << 32 | low;
 #elif (defined __SUNPRO_CC && (__SUNPRO_CC >= 0x5100) && (defined __i386 || \
-    defined __amd64 || defined __x86_64))
+            defined __amd64 || defined __x86_64))
     union {
         uint64_t u64val;
         uint32_t u32val [2];

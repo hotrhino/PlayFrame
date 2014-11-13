@@ -21,7 +21,7 @@ ConnCache::ConnCache()
     recv_buf_size_ = 0;
     recv_buf_capacity_ = 0;
 }
-    
+
 void ConnCache::Init() {
     send_buf_ = (char*)malloc(CONN_CACHE_BUF_LEN);
     assert(send_buf_ != NULL);
@@ -108,7 +108,7 @@ bool ConnCache::IsRecvProtoReady()
 {
     int proto_len = (int)ntohs(*(uint16_t*)recv_buf_);
     if (recv_buf_size_ > (int)sizeof(uint16_t) &&
-        proto_len <= recv_buf_size_)
+            proto_len <= recv_buf_size_)
         return true;
     else
         return false;

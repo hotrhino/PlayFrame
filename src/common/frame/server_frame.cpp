@@ -201,11 +201,11 @@ ServerFrame::~ServerFrame()
 void ServerFrame::ShowHelp(const char* AppName)
 {
     fprintf(stderr, "Usage:%s -d --daemon "
-        "-c --conf-file "
-        "-s --script-file "
-        "-p --log-path "
-        "-l --log-level\n",
-        AppName);
+            "-c --conf-file "
+            "-s --script-file "
+            "-p --log-path "
+            "-l --log-level\n",
+            AppName);
 }
 
 int32_t ServerFrame::ParseParam(int32_t argc, char* argv[])
@@ -226,41 +226,41 @@ int32_t ServerFrame::ParseParam(int32_t argc, char* argv[])
         switch (opt) {
             case 'D':
             case 'd': {
-                is_daemon_ = true;
-                break;
-            }
+                          is_daemon_ = true;
+                          break;
+                      }
             case 'c': {
-                strcpy(conf_name_, optarg);
-                break;
-            }
+                          strcpy(conf_name_, optarg);
+                          break;
+                      }
             case 's': {
-                strcpy(script_name_, optarg);
-                break;
-            }
+                          strcpy(script_name_, optarg);
+                          break;
+                      }
             case 'p': {
-                strcpy(log_path_, optarg);
-                break;
-            }
+                          strcpy(log_path_, optarg);
+                          break;
+                      }
             case 'l': {
-                if (strcmp(optarg, "info") == 0) {
-                    log_level_ = 0;
-                } else if (strcmp(optarg, "warning") == 0) {
-                    log_level_ = 1;
-                } else if (strcmp(optarg, "error") == 0) {
-                    log_level_ = 2;
-                } else if (strcmp(optarg, "fatal") == 0) {
-                    log_level_ = 4;
-                } else {
-                    log_level_ = 0;
-                }
-                break;
-            }
-        case '?':
-        default:
-            {
-                ShowHelp(argv[0]);
-                continue;
-            }
+                          if (strcmp(optarg, "info") == 0) {
+                              log_level_ = 0;
+                          } else if (strcmp(optarg, "warning") == 0) {
+                              log_level_ = 1;
+                          } else if (strcmp(optarg, "error") == 0) {
+                              log_level_ = 2;
+                          } else if (strcmp(optarg, "fatal") == 0) {
+                              log_level_ = 4;
+                          } else {
+                              log_level_ = 0;
+                          }
+                          break;
+                      }
+            case '?':
+            default:
+                      {
+                          ShowHelp(argv[0]);
+                          continue;
+                      }
         }
     }
 

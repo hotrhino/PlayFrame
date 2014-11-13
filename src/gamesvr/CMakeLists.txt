@@ -3,22 +3,23 @@ MESSAGE(STATUS "CMAKE_CURRENT_SOURCE_DIR" ${CMAKE_CURRENT_SOURCE_DIR})
 INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/config_module
-    ${CMAKE_CURRENT_SOURCE_DIR}/lua_engine_module
     ${CMAKE_CURRENT_SOURCE_DIR}/msg_module
     ${CMAKE_CURRENT_SOURCE_DIR}/obj_mgr_module
     ${CMAKE_CURRENT_SOURCE_DIR}/obj_mgr_module/object
     ${CMAKE_CURRENT_SOURCE_DIR}/timer_mgr_module
+    ${CMAKE_CURRENT_SOURCE_DIR}/logic_module
+    ${CMAKE_CURRENT_SOURCE_DIR}/logic_module/logic
 )
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/../run/gamesvr/bin)
 AUX_SOURCE_DIRECTORY(. SRC)
 AUX_SOURCE_DIRECTORY(./config_module SRC)
-AUX_SOURCE_DIRECTORY(./lua_engine_module SRC)
 AUX_SOURCE_DIRECTORY(./msg_module SRC)
 AUX_SOURCE_DIRECTORY(./obj_mgr_module SRC)
 AUX_SOURCE_DIRECTORY(./obj_mgr_module/object SRC)
 AUX_SOURCE_DIRECTORY(./timer_mgr_module SRC)
+AUX_SOURCE_DIRECTORY(./logic_module SRC)
+AUX_SOURCE_DIRECTORY(./logic_module/logic SRC)
 ADD_EXECUTABLE(gamesvr ${SRC})
 TARGET_LINK_LIBRARIES(gamesvr ${STATIC_LIBS} ${DYN_LIBS})
 
-ADD_SUBDIRECTORY(lua_engine_module/script)
 

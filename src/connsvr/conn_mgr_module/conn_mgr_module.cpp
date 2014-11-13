@@ -9,9 +9,10 @@
 #include "app.h"
 #include "config_module.h"
 
-ConnMgrModule::ConnMgrModule(App* app)
-	: AppModuleBase(app)
-{}
+ConnMgrModule::ConnMgrModule(App* app) :
+    AppModuleBase(app)
+{
+}
 
 ConnMgrModule::~ConnMgrModule()
 {}
@@ -28,38 +29,38 @@ void ConnMgrModule::ModuleInit()
 
     CHECK(conn_pool_.Init(conn_pool_size, conn_pool_shm_key) == 0)
         << "conn_pool init error!";
-	LOG(INFO) << ModuleName() << " init ok!";
+    LOG(INFO) << ModuleName() << " init ok!";
 }
 
 void ConnMgrModule::ModuleFini()
 {
     for (ConnectionMap::iterator it = conn_map_.begin();
-        it != conn_map_.end(); ++it) {
+            it != conn_map_.end(); ++it) {
         close(it->first);
     }
 
-	LOG(INFO) << ModuleName() << " fini completed!";
+    LOG(INFO) << ModuleName() << " fini completed!";
 }
 
 const char* ConnMgrModule::ModuleName() const
 {
-	static const std::string module_name = "ConnMgrModule";
-	return module_name.c_str();
+    static const std::string module_name = "ConnMgrModule";
+    return module_name.c_str();
 }
 
 int32_t ConnMgrModule::ModuleId()
 {
-	return MODULE_ID_CONN_MGR;
+    return MODULE_ID_CONN_MGR;
 }
 
 AppModuleBase* ConnMgrModule::CreateModule(App* app)
 {
-	ConnMgrModule* conn_mgr_module = new ConnMgrModule(app);
-	if (conn_mgr_module != NULL) {
+    ConnMgrModule* conn_mgr_module = new ConnMgrModule(app);
+    if (conn_mgr_module != NULL) {
         conn_mgr_module->ModuleInit();
-	}
+    }
 
-	return static_cast<AppModuleBase*>(conn_mgr_module);
+    return static_cast<AppModuleBase*>(conn_mgr_module);
 }
 
 Connection* ConnMgrModule::CreateConn(int32_t conn_fd)

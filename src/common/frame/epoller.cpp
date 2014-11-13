@@ -76,7 +76,7 @@ void Epoller::DelEvent(int fd, int mask)
     if (fe->mask_ == EVENT_NONE) return;
 
     fe->mask_ = fe->mask_ & (~mask);
-    
+
     struct epoll_event ee;
     ee.events = 0;
     if (fe->mask_ & EVENT_READ) ee.events |= EPOLLIN;
@@ -94,7 +94,7 @@ void Epoller::DelEvent(int fd, int mask)
 void Epoller::Loop(int timeout)
 {
     int ret = epoll_wait(ev_loop_->epfd_,
-        ev_loop_->epoll_events_, ev_loop_->max_events_size_, timeout); 
+            ev_loop_->epoll_events_, ev_loop_->max_events_size_, timeout); 
 
     if (ret > 0) {
         for (int i = 0; i < ret; i++) {

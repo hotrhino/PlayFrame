@@ -15,8 +15,6 @@
 #include "heap_timer.h"
 #include "server_frame.h"
 #include "msg_module_base.h"
-#include "lua_engine.h"
-#include "mysql_mgr.h"
 
 // protocol
 #include "database.pb.h"
@@ -34,6 +32,7 @@ enum {
     MODULE_ID_MSG,
     MODULE_ID_PLAYER_MGR,
     MODULE_ID_LUA_ENGINE,
+    MODULE_ID_LOGIC,
 };
 
 #endif

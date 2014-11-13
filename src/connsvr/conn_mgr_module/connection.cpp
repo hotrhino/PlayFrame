@@ -29,11 +29,11 @@ int32_t Connection::AddRecvData(char* buf, int buf_len)
 bool Connection::IsRecvProtoReady()
 {
     if (recv_buf_size_ > (int32_t)(sizeof(uint16_t)*2) &&
-        GetRecvProtoLen() <= recv_buf_size_)
+            GetRecvProtoLen() <= recv_buf_size_)
         return true;
     else
         return false;
-        
+
 }
 
 int32_t Connection::GetRecvProtoLen()

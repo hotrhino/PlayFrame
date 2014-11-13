@@ -13,25 +13,25 @@
 
 class ConfigModule : public AppModuleBase
 {
-public:
-	ConfigModule(App* app, const char* conf_file);
-	virtual ~ConfigModule();
+    public:
+        ConfigModule(App* app, const char* conf_file);
+        virtual ~ConfigModule();
 
-	virtual void            ModuleInit();
-	virtual void            ModuleFini();
-	virtual const char*     ModuleName() const;
-	static int32_t          ModuleId();
-	static AppModuleBase*   CreateModule(App* app, const char* conf_file);
+        virtual void            ModuleInit();
+        virtual void            ModuleFini();
+        virtual const char*     ModuleName() const;
+        static int32_t          ModuleId();
+        static AppModuleBase*   CreateModule(App* app, const char* conf_file);
 
-public:
-    inline const Config::DataSvr& config() const
-    {
-        return config_; 
-    }
+    public:
+        inline const Config::DataSvr& config() const
+        {
+            return config_; 
+        }
 
-private:
-    Config::DataSvr config_;
-    std::string     conf_file_;
+    private:
+        Config::DataSvr config_;
+        std::string     conf_file_;
 };
 
 #endif

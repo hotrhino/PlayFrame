@@ -26,18 +26,18 @@
 */
 class Random
 {
-public:
-    DISALLOW_COPY_AND_ASSIGN(Random);
-    explicit Random(int32_t seed = 0);
-    int32_t GetRand();
+    public:
+        DISALLOW_COPY_AND_ASSIGN(Random);
+        explicit Random(int32_t seed = 0);
+        int32_t GetRand();
 
-private:
-    int32_t seed_;
+    private:
+        int32_t seed_;
 
-    static const int32_t A;
-    static const int32_t M;
-    static const int32_t Q;
-    static const int32_t R;
+        static const int32_t A;
+        static const int32_t M;
+        static const int32_t Q;
+        static const int32_t R;
 };
 
 #endif // _RANDOM_H_
