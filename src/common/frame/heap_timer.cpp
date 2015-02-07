@@ -75,7 +75,7 @@ int64_t HeapTimer::RegisterTimer(const TimeValue& interval,
     RotateUp(new_node, cur_size_, GetParentPos(cur_size_));
     cur_size_++;
 
-    LOG(INFO) << "RegisterTimer TimerSize[" << GetTimerSize() << "]";
+    LOG(INFO) << "RegisterTimer TimerSize[" << GetTimerSize() << "] TimerId[" << new_node->timer_id <<"]";
 
     return new_node->timer_id;
 }
@@ -115,7 +115,7 @@ void HeapTimer::TimerPoll(const TimeValue& now)
     while (cur_size_ > 0 && TimervalGte(now, heap_[0]->expire_time)) {
         int32_t ret = 0;
         TimerNode* expire_node = heap_[0];
-        int32_t timer_id = expire_node->timer_id;
+        int64_t timer_id = expire_node->timer_id;
 
         if (expire_node && expire_node->cb_obj)
             ret = expire_node->cb_obj->Execute(timer_id, expire_node->data);

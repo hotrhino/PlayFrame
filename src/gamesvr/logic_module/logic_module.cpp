@@ -139,6 +139,7 @@ int64_t LogicModule::CreateLogic(int32_t logic_type, time_t task_delay_secs)
     logic_data_head->step = 0;
 
     logic_data_map_.insert(LogicDataMap::value_type(logic_id, (void*)logic_data));
+    LOG(INFO) << "insert logic_id: " << logic_id;
     return logic_id;
 }
 

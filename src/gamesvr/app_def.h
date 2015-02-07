@@ -33,6 +33,7 @@ enum {
     MODULE_ID_PLAYER_MGR,
     MODULE_ID_LUA_ENGINE,
     MODULE_ID_LOGIC,
+    MODULE_ID_COROUTINE,
 };
 
 #endif

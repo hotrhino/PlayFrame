@@ -9,6 +9,7 @@ INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_SOURCE_DIR}/timer_mgr_module
     ${CMAKE_CURRENT_SOURCE_DIR}/logic_module
     ${CMAKE_CURRENT_SOURCE_DIR}/logic_module/logic
+    ${CMAKE_CURRENT_SOURCE_DIR}/coroutine_module
 )
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/../run/gamesvr/bin)
 AUX_SOURCE_DIRECTORY(. SRC)
@@ -19,6 +20,7 @@ AUX_SOURCE_DIRECTORY(./obj_mgr_module/object SRC)
 AUX_SOURCE_DIRECTORY(./timer_mgr_module SRC)
 AUX_SOURCE_DIRECTORY(./logic_module SRC)
 AUX_SOURCE_DIRECTORY(./logic_module/logic SRC)
+AUX_SOURCE_DIRECTORY(./coroutine_module SRC)
 ADD_EXECUTABLE(gamesvr ${SRC})
 TARGET_LINK_LIBRARIES(gamesvr ${STATIC_LIBS} ${DYN_LIBS})
 
